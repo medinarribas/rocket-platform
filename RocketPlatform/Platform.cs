@@ -34,6 +34,7 @@ namespace RocketPlatform {
             ReserveLandingPosition(position);
             return OkForLanding;
         }
+
         private bool IsALandingPosition(Position position) {
             return (position.X >= x && position.X <= x + width) && 
                    (position.Y >= y && position.Y <= y + height);
