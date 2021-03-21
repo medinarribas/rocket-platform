@@ -4,12 +4,15 @@ using NUnit.Framework;
 namespace RocketPlatform.Tests {
     public class RocketPlatformShould {
 
-        [Test]
-        public void response_ok_when_rocket_ask_for_a_position_whithin_the_boundaries() {
+        [TestCase(5,5)]
+        [TestCase(5,15)]
+        [TestCase(15,5)]
+        [TestCase(15,15)]
+        public void response_ok_when_rocket_ask_for_a_position_whithin_the_boundaries(int x, int y) {
 
             var platform = new Platform();
 
-            var response = platform.CanILandOn(new Position(5, 5));
+            var response = platform.CanILandOn(new Position(x, y));
 
             response.Should().Be("ok for landing");
         }
