@@ -14,6 +14,7 @@ namespace RocketPlatform.Tests {
 
         [TestCase(5,5)]
         [TestCase(5,15)]
+        [TestCase(10,10)]
         [TestCase(15,5)]
         [TestCase(15,15)]
         public async Task response_ok_when_rocket_ask_for_a_position_whithin_the_boundaries(int x, int y) {
@@ -62,7 +63,7 @@ namespace RocketPlatform.Tests {
         }
 
         [Test]
-        public async Task response_clash_when_position_has_been_checked_by_other_rocket() {
+        public async Task response_clash_when_position_has_been_checked_previously() {
             var position = new Position(6, 6);
             var request = platform.CanILandOn(position);
             var otherRequest = platform.CanILandOn(position);
