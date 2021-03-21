@@ -1,21 +1,27 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
+
+using System.Threading.Tasks;
 
 namespace RocketPlatform {
     public class Platform {
         private const string OkForLanding = "ok for landing";
         private const string OutOfPlatform = "out of platform";
         private const string Clash = "clash";
-        private readonly List<LandingPosition> landingPositions;
+        private readonly BlockingCollection<LandingPosition> landingPositions;
 
         public Platform() {
-            landingPositions = new List<LandingPosition>();
+            landingPositions = new BlockingCollection<LandingPosition>();
         }
 
-        public string CanILandOn(Position position) {
+        public async Task<string> CanILandOn(Position position) {
+            return await Task.FromResult(GetLandingAvailability(position));
+        }
+
+        public string GetLandingAvailability(Position position) {
             var landingPosition = RegisterLandingPosition(position);
             if (!IsALandingPosition(landingPosition)) return  OutOfPlatform;
             if (landingPosition.IsReserved) return Clash;
