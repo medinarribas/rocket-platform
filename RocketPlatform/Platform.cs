@@ -5,7 +5,7 @@ namespace RocketPlatform {
     public class Platform {
         public string CanILandOn(Position position) {
             if (IsALandingPosition(position)) return "ok for landing";
-            throw new NotImplementedException();
+            return "out of platform";
         }
 
         private static bool IsALandingPosition(Position position) {
