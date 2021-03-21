@@ -77,9 +77,8 @@ namespace RocketPlatform.Tests {
 
         [Test]
         public async Task response_in_parallel() {
-            var position = new Position(6, 6);
-            var request = platform.CanILandOn(position);
-            var clashRequest = platform.CanILandOn(position);
+            var request = platform.CanILandOn(new Position(6, 6));
+            var clashRequest = platform.CanILandOn(new Position(7, 6));
             var outRequest = platform.CanILandOn(new Position(3,4));
 
             await Task.WhenAll(new List<Task> {request, clashRequest, outRequest });
