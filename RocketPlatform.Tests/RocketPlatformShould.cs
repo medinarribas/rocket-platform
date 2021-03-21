@@ -75,5 +75,21 @@ namespace RocketPlatform.Tests {
             responses.Should().Contain("clash");
         }
 
+        [Test]
+        public async Task response_in_parallel() {
+            var position = new Position(6, 6);
+            var request = platform.CanILandOn(position);
+            var clashRequest = platform.CanILandOn(position);
+            var outRequest = platform.CanILandOn(new Position(3,4));
+
+            await Task.WhenAll(new List<Task> {request, clashRequest, outRequest });
+
+            var responses = new List<string> { request.Result, clashRequest.Result, outRequest.Result};
+
+            responses.Should().Contain("ok for landing");
+            responses.Should().Contain("clash");
+            responses.Should().Contain("out of platform");
+        }
+
     }
 }
