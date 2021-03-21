@@ -7,12 +7,20 @@ using System.Threading.Tasks;
 
 namespace RocketPlatform {
     public class Platform {
+        private readonly int x;
+        private readonly int width;
+        private readonly int y;
+        private readonly int height;
         private const string OkForLanding = "ok for landing";
         private const string OutOfPlatform = "out of platform";
         private const string Clash = "clash";
         private readonly BlockingCollection<LandingPosition> landingPositions;
 
-        public Platform() {
+        public Platform(int x, int width, int y, int height) {
+            this.x = x;
+            this.width = width;
+            this.y = y;
+            this.height = height;
             landingPositions = new BlockingCollection<LandingPosition>();
         }
 
@@ -54,8 +62,9 @@ namespace RocketPlatform {
             return landingPositions.FirstOrDefault(landingPosition => landingPosition.IsLocatedOn(position));
         }
 
-        private static bool IsALandingPosition(LandingPosition position) {
-            return (position.X >= 5 && position.X <= 15) && (position.Y >= 5 && position.Y <= 15);
+        private bool IsALandingPosition(LandingPosition position) {
+            return (position.X >= x && position.X <= x + width) && 
+                   (position.Y >= y && position.Y <= y + height);
         }
     }
 }

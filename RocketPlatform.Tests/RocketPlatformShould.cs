@@ -9,7 +9,7 @@ namespace RocketPlatform.Tests {
 
         [SetUp]
         public void Setup() {
-            platform = new Platform();
+            platform = new Platform(5, 10, 5, 10);
         }
 
         [TestCase(5,5)]
