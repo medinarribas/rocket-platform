@@ -4,12 +4,12 @@ using NUnit.Framework;
 namespace RocketPlatform.Tests {
     public class RocketPlatformShould {
         private Platform platform;
+        private Position position;
 
         [SetUp]
         public void Setup() {
             platform = new Platform();
         }
-
 
         [TestCase(5,5)]
         [TestCase(5,15)]
@@ -31,6 +31,16 @@ namespace RocketPlatform.Tests {
             var response = platform.CanILandOn(new Position(x, y));
             
             response.Should().Be("out of platform");
+        }
+
+        [Test]
+        public void response_clash_when_position_has_been_checked() {
+            position = new Position(6, 6);
+            platform.CanILandOn(position);
+
+            var response = platform.CanILandOn(position);
+            
+            response.Should().Be("clash");
         }
     }
 }
