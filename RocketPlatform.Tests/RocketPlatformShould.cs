@@ -84,11 +84,9 @@ namespace RocketPlatform.Tests {
 
             await Task.WhenAll(new List<Task> {request, clashRequest, outRequest });
 
-            var responses = new List<string> { request.Result, clashRequest.Result, outRequest.Result};
-
-            responses.Should().Contain("ok for landing");
-            responses.Should().Contain("clash");
-            responses.Should().Contain("out of platform");
+            request.Result.Should().Contain("ok for landing");
+            clashRequest.Result.Should().Contain("clash");
+            outRequest.Result.Should().Contain("out of platform");
         }
 
     }
