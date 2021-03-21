@@ -24,8 +24,8 @@ namespace RocketPlatform {
             landingPositions = new BlockingCollection<LandingPosition>();
         }
 
-        public async Task<string> CanILandOn(Position position) {
-            return await Task.FromResult(GetLandingAvailabilityFor(position));
+        public async Task<string> CanILandOn(Position position, string rocketId) {
+            return await Task.FromResult(GetLandingAvailabilityFor(position, rocketId));
         }
 
         private void Validate() {
@@ -35,12 +35,12 @@ namespace RocketPlatform {
             if (height < 0) throw new ArgumentException();
         }
 
-        private string GetLandingAvailabilityFor(Position position) {
+        private string GetLandingAvailabilityFor(Position position, string rocketId) {
             if (!IsALandingPosition(position)) return OutOfPlatform;
-            if (IsReserved(position)) return Clash;
+            if (IsReserved(position, rocketId)) return Clash;
             if (IsNextToReservedPosition(position)) return Clash;
             
-            ReserveLandingPosition(position);
+            ReserveLandingPosition(position, rocketId);
             return OkForLanding;
         }
 
@@ -49,13 +49,16 @@ namespace RocketPlatform {
                    (position.Y >= y && position.Y <= y + height);
         }
 
-        private bool IsReserved(Position position) {
-            return GetReservedLandingPositionAt(position.X, position.Y) != null;
+        private bool IsReserved(Position position, string rocketId) {
+            var reservedPosition = GetReservedLandingPositionAt(position.X, position.Y);
+            if (reservedPosition == null) return false;
+            if (reservedPosition.IsReservedBy(rocketId)) return false;
+            return true;
         }
 
         private bool IsNextToReservedPosition(Position position) {
             var landingPosition = new LandingPosition(position.X, position.Y);
-            var neighbours = landingPosition.GetNeightbours();
+            var neighbours = landingPosition.GetNeighbours();
             foreach (var neighbour in neighbours) {
                 var pos = GetReservedLandingPositionAt(neighbour.X, neighbour.Y);
                 if (pos == null) continue;
@@ -68,9 +71,9 @@ namespace RocketPlatform {
             return landingPositions.FirstOrDefault(landingPosition => landingPosition.IsLocatedOn(x, y));
         }
 
-        private void ReserveLandingPosition(Position position) {
+        private void ReserveLandingPosition(Position position, string rocketId) {
             var landingPosition = NewLandingPosition(position);
-            landingPosition.Reserve();
+            landingPosition.ReserveTo(rocketId);
             landingPositions.Add(landingPosition);
         }
 

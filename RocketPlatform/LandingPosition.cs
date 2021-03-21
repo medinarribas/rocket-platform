@@ -5,19 +5,24 @@ namespace RocketPlatform {
 
         public int X { get; }
         public int Y { get; }
-        public bool HasBeenChecked { get; private set; }
+        public bool HasBeenChecked => !string.IsNullOrEmpty(RocketId);
+        private string RocketId { get; set; }
 
         public LandingPosition(int x, int y) {
             Y = y;
             X = x;
         }
 
-        public void Reserve() {
-            HasBeenChecked = true;
+        public void ReserveTo(string rocketId) {
+            RocketId = rocketId;
         }
 
         public bool IsLocatedOn(int x, int y) {
             return X == x && Y == y;
+        }
+
+        public bool IsReservedBy(string rocketId) {
+            return (RocketId == rocketId);
         }
 
         public List<LandingPosition> GetNeighbours() {

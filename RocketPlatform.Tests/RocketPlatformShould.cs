@@ -7,10 +7,14 @@ using NUnit.Framework;
 namespace RocketPlatform.Tests {
     public class RocketPlatformShould {
         private Platform platform;
+        private string rocketId;
+        private string otherRocketId;
 
         [SetUp]
         public void Setup() {
             platform = new Platform(5, 10, 5, 10);
+            rocketId = Guid.NewGuid().ToString();
+            otherRocketId = Guid.NewGuid().ToString();
         }
 
         [TestCase(-1, 10, 5, 10)]
@@ -18,6 +22,7 @@ namespace RocketPlatform.Tests {
         [TestCase(5, 10, -1, 10)]
         [TestCase(5, 10, 5, -1)]
         public void throw_if_boundaries_are_negative(int x, int width, int y, int height) {
+
             Action action = () => new Platform(x, width, y, height);
 
            action.Should().Throw<ArgumentException>();
@@ -30,7 +35,7 @@ namespace RocketPlatform.Tests {
         [TestCase(15,15)]
         public async Task response_ok_when_rocket_ask_for_a_position_whithin_the_boundaries(int x, int y) {
 
-            var response = await platform.CanILandOn(new Position(x, y));
+            var response = await platform.CanILandOn(new Position(x, y), rocketId);
 
             response.Should().Be("ok for landing");
         }
@@ -41,19 +46,9 @@ namespace RocketPlatform.Tests {
         [TestCase(15,16)]
         public async Task response_out_when_rocket_ask_for_a_position_out_of_the_boundaries(int x, int y) {
 
-            var response = await platform.CanILandOn(new Position(x, y));
+            var response = await platform.CanILandOn(new Position(x, y), rocketId);
             
             response.Should().Be("out of platform");
-        }
-
-        [Test]
-        public async Task response_clash_when_position_has_been_checked() {
-            var position = new Position(6, 6);
-            await platform.CanILandOn(position);
-
-            var response =await platform.CanILandOn(position);
-            
-            response.Should().Be("clash");
         }
 
         [TestCase(5,5)]
@@ -66,18 +61,32 @@ namespace RocketPlatform.Tests {
         [TestCase(7,7)]
         public async Task response_clash_when_position_is_next_to_checked_position(int x, int y) {
             var checkedPosition = new Position(6, 6);
-            await platform.CanILandOn(checkedPosition);
+            await platform.CanILandOn(checkedPosition, rocketId);
 
-            var response =await platform.CanILandOn(new Position(x, y));
+            var response = await platform.CanILandOn(new Position(x, y), rocketId);
             
             response.Should().Be("clash");
         }
 
         [Test]
-        public async Task response_clash_when_position_has_been_checked_previously() {
+        public async Task response_ok_when_position_has_been_checked_previously_by_the_same_rocket() {
             var position = new Position(6, 6);
-            var request = platform.CanILandOn(position);
-            var otherRequest = platform.CanILandOn(position);
+            var request = platform.CanILandOn(position, rocketId);
+            var otherRequest = platform.CanILandOn(position, rocketId);
+
+            await Task.WhenAll(new List<Task> {request, otherRequest});
+
+            var responses = new List<string> { request.Result, otherRequest.Result};
+
+            responses.Should().Contain("ok for landing");
+            responses.Should().Contain("ok for landing");
+        }
+
+        [Test]
+        public async Task response_clash_when_position_has_been_checked_previously_by_other_rocket() {
+            var position = new Position(6, 6);
+            var request = platform.CanILandOn(position, rocketId);
+            var otherRequest = platform.CanILandOn(position, otherRocketId);
 
             await Task.WhenAll(new List<Task> {request, otherRequest});
 
@@ -89,14 +98,16 @@ namespace RocketPlatform.Tests {
 
         [Test]
         public async Task response_in_parallel() {
-            var request = platform.CanILandOn(new Position(6, 6));
-            var clashRequest = platform.CanILandOn(new Position(7, 6));
-            var outRequest = platform.CanILandOn(new Position(3,4));
+            var request = platform.CanILandOn(new Position(6, 6), rocketId);
+            var otherRequest = platform.CanILandOn(new Position(7, 6), otherRocketId);
+            var outRequest = platform.CanILandOn(new Position(3,4), rocketId);
 
-            await Task.WhenAll(new List<Task> {request, clashRequest, outRequest });
+            await Task.WhenAll(new List<Task> {request, otherRequest, outRequest });
 
-            request.Result.Should().Contain("ok for landing");
-            clashRequest.Result.Should().Contain("clash");
+            var responses = new List<string> { request.Result, otherRequest.Result, outRequest.Result };
+
+            responses.Should().Contain("ok for landing");
+            responses.Should().Contain("clash");
             outRequest.Result.Should().Contain("out of platform");
         }
 
