@@ -25,7 +25,7 @@ namespace RocketPlatform {
         }
 
         public async Task<string> CanILandOn(Position position) {
-            return await Task.FromResult(GetLandingAvailability(position));
+            return await Task.FromResult(GetLandingAvailabilityFor(position));
         }
 
         private void Validate() {
@@ -35,7 +35,7 @@ namespace RocketPlatform {
             if (height < 0) throw new ArgumentException();
         }
 
-        private string GetLandingAvailability(Position position) {
+        private string GetLandingAvailabilityFor(Position position) {
             if (!IsALandingPosition(position)) return OutOfPlatform;
             if (IsReserved(position)) return Clash;
             if (IsNextToReservedPosition(position)) return Clash;
