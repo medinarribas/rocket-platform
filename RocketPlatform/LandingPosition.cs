@@ -5,7 +5,7 @@ namespace RocketPlatform {
 
         public int X { get; }
         public int Y { get; }
-        public bool IsReserved { get; private set; }
+        public bool HasBeenChecked { get; private set; }
 
         public LandingPosition(int x, int y) {
             Y = y;
@@ -13,11 +13,11 @@ namespace RocketPlatform {
         }
 
         public void Reserve() {
-            IsReserved = true;
+            HasBeenChecked = true;
         }
 
-        public bool IsLocatedOn(LandingPosition other) {
-            return X == other.X && Y == other.Y;
+        public bool IsLocatedOn(int x, int y) {
+            return X == x && Y == y;
         }
 
         public List<LandingPosition> GetNeightbours() {

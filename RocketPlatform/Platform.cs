@@ -27,42 +27,46 @@ namespace RocketPlatform {
         }
 
         public string GetLandingAvailability(Position position) {
-            var landingPosition = RegisterLandingPosition(new LandingPosition(position.X, position.Y));
-            if (!IsALandingPosition(landingPosition)) return OutOfPlatform;
-            if (landingPosition.IsReserved) return Clash;
-            if (IsNextToCheckedPosition(position)) return Clash;
-        
-            landingPosition.Reserve();
+            if (!IsALandingPosition(position)) return OutOfPlatform;
+            if (IsReserved(position)) return Clash;
+            if (IsNextToReservedPosition(position)) return Clash;
+            
+            ReserveLandingPosition(position);
             return OkForLanding;
         }
+        private bool IsALandingPosition(Position position) {
+            return (position.X >= x && position.X <= x + width) && 
+                   (position.Y >= y && position.Y <= y + height);
+        }
 
-        private bool IsNextToCheckedPosition(Position position) {
+        private bool IsReserved(Position position) {
+            return GetReservedLandingPositionAt(position.X, position.Y) != null;
+        }
+
+        private bool IsNextToReservedPosition(Position position) {
             var landingPosition = new LandingPosition(position.X, position.Y);
             var neighbours = landingPosition.GetNeightbours();
             foreach (var neighbour in neighbours) {
-                var pos = GetLandingPosition(neighbour);
+                var pos = GetReservedLandingPositionAt(neighbour.X, neighbour.Y);
                 if (pos == null) continue;
-                if (pos.IsReserved) return true;
+                if (pos.HasBeenChecked) return true;
             }
             return false;
         }
 
-        private LandingPosition RegisterLandingPosition(LandingPosition position) {
-            var pos = GetLandingPosition(position);
-            if (pos != null) return pos;
-
-            var newPos = new LandingPosition(position.X, position.Y);
-            landingPositions.Add(newPos);
-            return newPos;
+        private LandingPosition GetReservedLandingPositionAt(int x, int y) {
+            return landingPositions.FirstOrDefault(landingPosition => landingPosition.IsLocatedOn(x, y));
         }
 
-        private LandingPosition GetLandingPosition(LandingPosition position) {
-            return landingPositions.FirstOrDefault(landingPosition => landingPosition.IsLocatedOn(position));
+        private void ReserveLandingPosition(Position position) {
+            var landingPosition = NewLandingPosition(position);
+            landingPosition.Reserve();
+            landingPositions.Add(landingPosition);
         }
 
-        private bool IsALandingPosition(LandingPosition position) {
-            return (position.X >= x && position.X <= x + width) && 
-                   (position.Y >= y && position.Y <= y + height);
+        private static LandingPosition NewLandingPosition(Position position) {
+            return new LandingPosition(position.X, position.Y);
         }
+
     }
 }
