@@ -24,15 +24,15 @@ namespace RocketPlatform {
             landingPositions = new BlockingCollection<LandingPosition>();
         }
 
+        public async Task<string> CanILandOn(Position position) {
+            return await Task.FromResult(GetLandingAvailability(position));
+        }
+
         private void Validate() {
             if (x < 0) throw new ArgumentException();
             if (width < 0) throw new ArgumentException();
             if (y < 0) throw new ArgumentException();
             if (height < 0) throw new ArgumentException();
-        }
-
-        public async Task<string> CanILandOn(Position position) {
-            return await Task.FromResult(GetLandingAvailability(position));
         }
 
         private string GetLandingAvailability(Position position) {
