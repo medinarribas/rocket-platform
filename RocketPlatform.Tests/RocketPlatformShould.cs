@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -10,6 +11,16 @@ namespace RocketPlatform.Tests {
         [SetUp]
         public void Setup() {
             platform = new Platform(5, 10, 5, 10);
+        }
+
+        [TestCase(-1, 10, 5, 10)]
+        [TestCase(5, -1, 5, 10)]
+        [TestCase(5, 10, -1, 10)]
+        [TestCase(5, 10, 5, -1)]
+        public void throw_if_boundaries_are_negative(int x, int width, int y, int height) {
+            Action action = () => new Platform(x, width, y, height);
+
+           action.Should().Throw<ArgumentException>();
         }
 
         [TestCase(5,5)]

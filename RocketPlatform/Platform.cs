@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Concurrent;
 using System.Linq;
 
@@ -19,14 +20,22 @@ namespace RocketPlatform {
             this.width = width;
             this.y = y;
             this.height = height;
+            Validate();
             landingPositions = new BlockingCollection<LandingPosition>();
+        }
+
+        private void Validate() {
+            if (x < 0) throw new ArgumentException();
+            if (width < 0) throw new ArgumentException();
+            if (y < 0) throw new ArgumentException();
+            if (height < 0) throw new ArgumentException();
         }
 
         public async Task<string> CanILandOn(Position position) {
             return await Task.FromResult(GetLandingAvailability(position));
         }
 
-        public string GetLandingAvailability(Position position) {
+        private string GetLandingAvailability(Position position) {
             if (!IsALandingPosition(position)) return OutOfPlatform;
             if (IsReserved(position)) return Clash;
             if (IsNextToReservedPosition(position)) return Clash;
