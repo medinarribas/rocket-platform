@@ -6,7 +6,6 @@ using NUnit.Framework;
 namespace RocketPlatform.Tests {
     public class RocketPlatformShould {
         private Platform platform;
-        private Position position;
 
         [SetUp]
         public void Setup() {
@@ -37,7 +36,7 @@ namespace RocketPlatform.Tests {
 
         [Test]
         public async Task response_clash_when_position_has_been_checked() {
-            position = new Position(6, 6);
+            var position = new Position(6, 6);
             await platform.CanILandOn(position);
 
             var response =await platform.CanILandOn(position);
@@ -45,9 +44,26 @@ namespace RocketPlatform.Tests {
             response.Should().Be("clash");
         }
 
+        [TestCase(5,5)]
+        [TestCase(5,6)]
+        [TestCase(5,7)]
+        [TestCase(6,5)]
+        [TestCase(6,7)]
+        [TestCase(7,5)]
+        [TestCase(7,6)]
+        [TestCase(7,7)]
+        public async Task response_clash_when_position_is_next_to_checked_position(int x, int y) {
+            var checkedPosition = new Position(6, 6);
+            await platform.CanILandOn(checkedPosition);
+
+            var response =await platform.CanILandOn(new Position(x, y));
+            
+            response.Should().Be("clash");
+        }
+
         [Test]
         public async Task response_clash_when_position_has_been_checked_by_other_rocket() {
-            position = new Position(6, 6);
+            var position = new Position(6, 6);
             var request = platform.CanILandOn(position);
             var otherRequest = platform.CanILandOn(position);
 
@@ -58,5 +74,6 @@ namespace RocketPlatform.Tests {
             responses.Should().Contain("ok for landing");
             responses.Should().Contain("clash");
         }
+
     }
 }
