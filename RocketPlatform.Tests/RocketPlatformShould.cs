@@ -9,7 +9,7 @@ namespace RocketPlatform.Tests {
 
             var platform = new Platform();
 
-            var response = platform.CanILandOn(5, 5);
+            var response = platform.CanILandOn(new Position(5, 5));
 
             response.Should().Be("ok for landing");
         }
