@@ -20,7 +20,7 @@ namespace RocketPlatform {
             return X == x && Y == y;
         }
 
-        public List<LandingPosition> GetNeightbours() {
+        public List<LandingPosition> GetNeighbours() {
             return new List<LandingPosition>() {
                 new LandingPosition(X-1,  Y-1),
                 new LandingPosition(X-1,  Y),
