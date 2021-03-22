@@ -9,11 +9,13 @@ namespace RocketPlatform.Tests {
         private Platform platform;
         private string rocketId;
         private string otherRocketId;
+        const byte PlatformWidth = 100;
+        const byte PlatformHeight = 100;
 
         [SetUp]
         public void Setup() {
             var landingArea = new LandingArea(5, 10, 5, 10);
-            platform = new Platform(landingArea);
+            platform = new Platform(landingArea, PlatformWidth, PlatformHeight);
             rocketId = Guid.NewGuid().ToString();
             otherRocketId = Guid.NewGuid().ToString();
         }
@@ -22,9 +24,18 @@ namespace RocketPlatform.Tests {
         [TestCase(5, -1, 5, 10)]
         [TestCase(5, 10, -1, 10)]
         [TestCase(5, 10, 5, -1)]
-        public void throw_if_boundaries_are_negative(int x, int width, int y, int height) {
+        public void throw_if_landing_area_boundaries_are_negative(int x, int width, int y, int height) {
             var landingArea = new LandingArea(x, width, y, height);
-            Action action = () => new Platform(landingArea);
+            Action action = () => new Platform(landingArea, PlatformWidth,PlatformHeight);
+
+            action.Should().Throw<ArgumentException>();
+        }
+
+        [TestCase(5, 96, 5, 95)]
+        [TestCase(5, 95, 5, 96)]
+        public void throw_if_landing_area_boundaries_are_bigger_than_limits(int x, int width, int y, int height) {
+            var landingArea = new LandingArea(x, width, y, height);
+            Action action = () => new Platform(landingArea, PlatformWidth,PlatformHeight);
 
             action.Should().Throw<ArgumentException>();
         }

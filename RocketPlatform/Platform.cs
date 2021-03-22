@@ -7,13 +7,17 @@ using System.Threading.Tasks;
 namespace RocketPlatform {
     public class Platform {
         private readonly LandingArea landingArea;
+        private readonly byte width;
+        private readonly byte height;
         private const string OkForLanding = "ok for landing";
         private const string OutOfPlatform = "out of platform";
         private const string Clash = "clash";
         private readonly BlockingCollection<LandingPosition> landingPositions;
 
-        public Platform(LandingArea landingArea) {
+        public Platform(LandingArea landingArea, byte width, byte height) {
             this.landingArea = landingArea;
+            this.width = width;
+            this.height = height;
             Validate();
             landingPositions = new BlockingCollection<LandingPosition>();
         }
@@ -27,6 +31,8 @@ namespace RocketPlatform {
             if (landingArea.Width < 0) throw new ArgumentException();
             if (landingArea.Y < 0) throw new ArgumentException();
             if (landingArea.Height < 0) throw new ArgumentException();
+            if (landingArea.MaxPositionX > width) throw new ArgumentException();
+            if (landingArea.MaxPositionY > height) throw new ArgumentException();
         }
 
         private string GetLandingAvailabilityFor(Position position, string rocketId) {
