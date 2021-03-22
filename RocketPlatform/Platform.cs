@@ -60,9 +60,8 @@ namespace RocketPlatform {
             var landingPosition = new LandingPosition(position.X, position.Y);
             var neighbours = landingPosition.GetNeighbours();
             foreach (var neighbour in neighbours) {
-                var pos = GetReservedLandingPositionAt(neighbour.X, neighbour.Y);
-                if (pos == null) continue;
-                if (pos.HasBeenChecked) return true;
+                var reservedPosition = GetReservedLandingPositionAt(neighbour.X, neighbour.Y);
+                if (reservedPosition != null) return true;
             }
             return false;
         }

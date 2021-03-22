@@ -2,10 +2,8 @@ using System.Collections.Generic;
 
 namespace RocketPlatform {
     public class LandingPosition {
-
         public int X { get; }
         public int Y { get; }
-        public bool HasBeenChecked => !string.IsNullOrEmpty(RocketId);
         private string RocketId { get; set; }
 
         public LandingPosition(int x, int y) {
