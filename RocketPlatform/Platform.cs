@@ -6,20 +6,14 @@ using System.Threading.Tasks;
 
 namespace RocketPlatform {
     public class Platform {
-        private readonly int x;
-        private readonly int width;
-        private readonly int y;
-        private readonly int height;
+        private readonly LandingArea landingArea;
         private const string OkForLanding = "ok for landing";
         private const string OutOfPlatform = "out of platform";
         private const string Clash = "clash";
         private readonly BlockingCollection<LandingPosition> landingPositions;
 
-        public Platform(int x, int width, int y, int height) {
-            this.x = x;
-            this.width = width;
-            this.y = y;
-            this.height = height;
+        public Platform(LandingArea landingArea) {
+            this.landingArea = landingArea;
             Validate();
             landingPositions = new BlockingCollection<LandingPosition>();
         }
@@ -29,10 +23,10 @@ namespace RocketPlatform {
         }
 
         private void Validate() {
-            if (x < 0) throw new ArgumentException();
-            if (width < 0) throw new ArgumentException();
-            if (y < 0) throw new ArgumentException();
-            if (height < 0) throw new ArgumentException();
+            if (landingArea.X < 0) throw new ArgumentException();
+            if (landingArea.Width < 0) throw new ArgumentException();
+            if (landingArea.Y < 0) throw new ArgumentException();
+            if (landingArea.Height < 0) throw new ArgumentException();
         }
 
         private string GetLandingAvailabilityFor(Position position, string rocketId) {
@@ -45,8 +39,8 @@ namespace RocketPlatform {
         }
 
         private bool IsALandingPosition(Position position) {
-            return (position.X >= x && position.X <= x + width) && 
-                   (position.Y >= y && position.Y <= y + height);
+            return (position.X >= landingArea.X && position.X <= landingArea.X + landingArea.Width) && 
+                   (position.Y >= landingArea.Y && position.Y <= landingArea.Y + landingArea.Height);
         }
 
         private bool IsReserved(Position position, string rocketId) {
